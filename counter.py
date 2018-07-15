@@ -47,18 +47,19 @@ pages = ["https://sketchfab.com/models/4e15331cc9cc4234b4b19ab39da7f5d9",
 "https://sketchfab.com/models/dcc9ecfc0b1a4240b614cb01a07d2553",
 "https://sketchfab.com/models/60dec74c203b448ea6ffddbd84fac36f"]
 
-n = 0
+sketchfab_count = 0
+
 for item in pages:
     page = requests.get(item)
     soup = BeautifulSoup(page.text, 'html.parser')
     name = soup.find("span", class_="model-name__label").get_text()
-    n += 1
     d_help = soup.find(class_="downloads help")
     d_tool = d_help.find(class_="tooltip tooltip-down")
     count = d_tool.find(class_="count").get_text()
-    total_count += int(count)
-    print(str(n)+" "+name+" has been downloaded "+count + " times.")
+    sketchfab_count += int(count)
+    #print(name+" has been downloaded "+count + " times.")
     f.writerow([name, count])
+    
 pages = ["https://3dwarehouse.sketchup.com/model/u98990ede-c350-4ba7-870e-2f9db8c2d840/Vision-Park","https://3dwarehouse.sketchup.com/model/u9f922ab3-3f26-4cbb-85f6-2f5f080f9079/SolarWindRain-All-in-one-Energy-Generator",
 "https://3dwarehouse.sketchup.com/model/ua2f3b650-7af7-4995-bf4a-e9037752c25a/McKenzie-Avenue-Highway-1-Interchange",
 "https://3dwarehouse.sketchup.com/model/u36f4077b-ca2c-42d0-a033-4611a86ac4f7/Moving-Tidal-Energy",
@@ -100,18 +101,32 @@ pages = ["https://3dwarehouse.sketchup.com/model/u98990ede-c350-4ba7-870e-2f9db8
 "https://3dwarehouse.sketchup.com/model/5eecfdac-b6fd-4017-a6d1-319e1667241b/Standard-Wheel",
 "https://3dwarehouse.sketchup.com/model/d87767a6-c3f2-4ced-b085-c33d5a9ffb08/Powerwall-2",
 "https://3dwarehouse.sketchup.com/model/78e149eb-d9e9-4c4e-af5e-2f52ca19a463/Battery-Pack-Radiator"]
-
 f = csv.writer(open('3Dsketchware.csv', 'w'))
 f.writerow(['Name', 'Downloads'])
-
+dwarehouse_count = 0
 for item in pages:
     page = requests.get(item)
     soup = BeautifulSoup(page.text, 'html.parser')
     name_div = soup.find("div", id="model-title-banner")
     name = name_div.find("h1").get_text()
-    n += 1
     count = soup.find(class_="downloadsCount").get_text()
-    print(str(n)+" "+name+" has been downloaded "+count + " times.")
+    counter = count.replace("Downloads","")
+    counter2 = counter.replace("K","000")
+    count = counter2
+    dwarehouse_count += int(count)
+    #print(name+" has been downloaded "+count + " times.")
    
 
-print(total_count)
+# Grabcad counter
+page = requests.get("https://grabcad.com/steven.samuel-1")
+soup = BeautifulSoup(page.text, 'html.parser')
+name_div = soup.find("table", class_="sidebar__table sidebar__table--alt")
+di = name_div.find_all('tr')[1]
+down = di.find('td')
+grabcad_count = int(down.get_text())
+
+total_count = sketchfab_count + dwarehouse_count + grabcad_count
+
+print("Total Downloads:\n Sketchfab: "+ str(sketchfab_count) + " 3D Warehouse: " + str(dwarehouse_count) + " Grabcad: " +str(grabcad_count))
+print("Overall, your models have been downloaded "+ str(total_count) + " times")
+    
